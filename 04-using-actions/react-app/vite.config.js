@@ -6,5 +6,6 @@ export default defineConfig({
   test: {
     globals: true, // Enables global test APIs (like `describe`, `it`, etc.)
     environment: 'jsdom', // Simulates a browser-like environment
+    setupFiles: './setupTests.js', // Include the test setup file
   },
 });
