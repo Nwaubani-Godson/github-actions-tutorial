@@ -1,14 +1,16 @@
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import App from './App';
 
 describe('App Component', () => {
   it('renders the heading and paragraph correctly', () => {
     render(<App />);
 
-    expect(screen.getByText(/Welcome to My Vite + React App/i)).toBeInTheDocument();
+    // Check if the <h1> element is rendered with the correct text
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading).toHaveTextContent('Welcome to My Vite + React App');
 
-    // Check if the <p> element is present
-    expect(screen.getByText(/this is the homepage/i)).toBeInTheDocument();
+    // Check if the <p> element is rendered with the correct text
+    const paragraph = screen.getByText('This is the homepage');
+    expect(paragraph).toBeInTheDocument();
   });
 });
