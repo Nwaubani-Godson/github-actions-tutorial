@@ -1,9 +1,6 @@
 name: 04 - Using Actions
 
-on: 
-  push:
-    branches:
-      - main
+on: workflow_dispatch
 
 jobs:
   build:
@@ -33,11 +30,7 @@ jobs:
       - name: Run Unit Tests
         run: npm test
 
-        
 
-             # Things we want to do
-             # 0. Checkout the code from the repository
-             # 1. Install the dependencies of our react application
-             # 2. Execute automated tests
 
+           
 
