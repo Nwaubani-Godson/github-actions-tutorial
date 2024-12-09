@@ -8,10 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults: 
-      run: 
-        working-directory: 04-using-actions/react-app
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -23,11 +19,12 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-
+        working-directory: 04-using-actions/react-app
       - name: Check File Existence
         run: |
-          ls -l 04-using-actions/react-app/setupTests.js
-          cat 04-using-actions/react-app/setupTests.js
+          cd 04-using-actions/react-app
+          ls -l 
+          cat setupTests.js
 
       - name: Debug `vite.config.js`
         run: |
@@ -35,13 +32,14 @@ jobs:
           echo "Setup files path: $(node -e \"console.log(require('path').resolve('setupTests.js'))\")"
 
       - name: Run Unit Tests
-        run: |
-          npm test -- --run --reporter verbose
+        run: npm test -- --run --reporter verbose
 
 
-           # Things we want to do
-    # 0. Checkout the code from the repository
-    # 1. Install the dependencies of our react application
-    # 2. Execute automated tests
+
+        
+             # Things we want to do
+             # 0. Checkout the code from the repository
+             # 1. Install the dependencies of our react application
+             # 2. Execute automated tests
 
 
