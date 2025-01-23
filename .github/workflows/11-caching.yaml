@@ -31,6 +31,10 @@ jobs:
           node-version: '20.x'
       - name: Install Dependencies
         run: npm ci
+      - name: Debug - List the dependencies of npm
+        run: |
+          echo "npm dependency tree"
+          npm ls
       - name: Testing 
         run: npm test
       - name: Buiding
