@@ -34,9 +34,9 @@ jobs:
       - name: Testing 
         run: npm test
       - name: Buiding
-        run: npm build
+        run: npm run build
       - name: Deploying to nonprod
-        run: echo "Deploying to nonprod"
+        run: echo "Deploying to nonprod environment"
 
 
  
