@@ -28,14 +28,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
+
       - name: Calculate Cache Key
         id: cache-key
         run: |
-            echo "CACHE_KEY=deps-node-modules-${{ runner.os }}-node-${{ inputs.node-version }}-deps-${{ hashFiles('11-caching2/react-app/package-lock.json') }}" >> "$GITHUB_OUTPUT"
+          echo "CACHE_KEY=deps-node-modules-${{ runner.os }}-node-${{ inputs.node-version }}-deps-${{ hashFiles('11-caching2/react-app/package-lock.json') }}" >> "$GITHUB_OUTPUT"
+
       - name: Download Cached Dependencies
         if: ${{ inputs.use-cache }}
         uses: actions/cache@v3
@@ -43,13 +46,13 @@ jobs:
         with:
           path: 11-caching2/react-app/node_modules
           key: ${{ steps.cache-key.outputs.CACHE_KEY }}
-      - name: Install Dependencies
+
+      - name: Check Cached Dependencies
+        run: ls -la 11-caching2/react-app/node_modules || echo "No node_modules directory found"
+
+      - name: Install Dependencies (if cache missed)
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: npm ci
-      - name: Debug - List the dependencies of npm
-        run: |
-          echo "npm dependency tree"
-          npm ls
 
   lint-test:
     runs-on: ubuntu-latest
@@ -58,49 +61,66 @@ jobs:
         working-directory: 11-caching2/react-app
     needs: install-deps
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ inputs.node-version }}
-
-    - name: Install Dependencies (fresh)
-      run: npm ci
-
-    - name: List Installed Binaries (debugging)
-      run: ls -la node_modules/.bin
-
-    - name: Testing with Vitest
-      run: npx vitest
-
-    - name: Linting
-      run: echo "Linting..."
-
-    
-  build:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: 11-caching/react-app
-    needs: install-deps
-    steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
+
       - name: Download Cached Dependencies
         if: ${{ inputs.use-cache }}
         uses: actions/cache@v3
         with:
           path: 11-caching2/react-app/node_modules
           key: ${{ needs.install-deps.outputs.deps-cache-key }}
+
+      - name: Check Cached Dependencies
+        run: ls -la 11-caching2/react-app/node_modules || echo "No node_modules directory found"
+
+      - name: Reinstall Dependencies if Cache is Broken
+        run: npm ci
+
+      - name: Debug - List Installed Packages
+        run: npm list --depth=0
+
+      - name: Testing
+        run: npx vitest
+
+      - name: Linting
+        run: echo "Linting..."
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 11-caching2/react-app
+    needs: install-deps
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Download Cached Dependencies
+        if: ${{ inputs.use-cache }}
+        uses: actions/cache@v3
+        with:
+          path: 11-caching2/react-app/node_modules
+          key: ${{ needs.install-deps.outputs.deps-cache-key }}
+
+      - name: Check Cached Dependencies
+        run: ls -la 11-caching2/react-app/node_modules || echo "No node_modules directory found"
+
+      - name: Reinstall Dependencies if Cache is Broken
+        run: npm ci
+
       - name: Building
         run: npm run build
+
       - name: Deploying to nonprod
         run: echo "Deploying to nonprod environment"
-
-
