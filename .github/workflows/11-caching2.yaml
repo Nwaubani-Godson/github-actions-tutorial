@@ -55,26 +55,30 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: 11-caching/react-app
+        working-directory: 11-caching2/react-app
     needs: install-deps
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node-version }}
-      - name: Download Cached Dependencies
-        if: ${{ inputs.use-cache }}
-        uses: actions/cache@v3
-        with:
-          path: 11-caching2/react-app/node_modules
-          key: ${{ needs.install-deps.outputs.deps-cache-key }}
-      - name: Testing
-        run: npm test
-      - name: Linting
-        run: echo "Linting..."
-      
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install Dependencies (fresh)
+      run: npm ci
+
+    - name: List Installed Binaries (debugging)
+      run: ls -la node_modules/.bin
+
+    - name: Testing with Vitest
+      run: npx vitest
+
+    - name: Linting
+      run: echo "Linting..."
+
+    
   build:
     runs-on: ubuntu-latest
     defaults:
