@@ -46,6 +46,10 @@ jobs:
       - name: Install Dependencies
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: npm ci
+      - name: Debug - List the dependencies of npm
+        run: |
+          echo "npm dependency tree"
+          npm ls
 
   lint-test:
     runs-on: ubuntu-latest
