@@ -1,0 +1,58 @@
+name: 12 - Working with Artifacts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 12-artifacts/react-app
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Download Cached Dependencies
+        uses: actions/cache@v3
+        id: cached-dependencies
+        with:
+            path: 11-caching2/react-app/node_modules
+            key: deps-node-modules-${{ hashFiles('12-artifacts/react-app/package-lock.json') }}
+
+      - name: Check Cached Dependencies
+        run: ls -la 12-artifacts/react-app/node_modules || echo "No node_modules directory found"
+  
+      - name: Reinstall Dependencies if Cache is Broken
+        run: npm ci
+  
+      - name: Debug - List Installed Packages
+        run: npm list --depth=0
+  
+      - name: Testing 
+        run: npx vitest
+
+      - name: Build code
+        run: npm run build
+
+      - name: Archive artifacts/Upload build files
+        uses: actions/upload-artifact@v2
+        with:
+          name: react-app
+          path: 12-artifacts/react-app/dist
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: react-app
+          path: 12-artifacts/react-app/dist
+      - name: Show folder structure
+        run: ls -R 
